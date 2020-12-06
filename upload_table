@@ -15,6 +15,7 @@ CREATE TABLE lol_original_data (
 	blueAvgLevel float8,
 	blueTotalExperience integer,
 	blueTotalMinionsKilled integer,
+	blueTotalJungleMinionsKilled integer,
 	blueGoldDiff integer,
 	blueExperienceDiff integer,
 	blueCSPerMin float8,
