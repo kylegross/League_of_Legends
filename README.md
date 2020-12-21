@@ -59,7 +59,7 @@ Much of the data in the dataset pertains to the champions, bans, and spells on e
 Another transformation we made to the data was to be mindful of game duration. We are interested in analyzing gameplay from standard matches, the duration of which averages around 33 minutes. We had several outliers that finished their games in under 1,000 seconds (16 minutes). We can assume that this could be for a myriad of reasons, but the most likely reason is the the teams voted to concede the game due to a factor that we are not interested in, such as a lagging, or non-participatory team member, or another extreme factor of some kind. Due to this, we dropped all games that ended in less that 1,000 seconds. We did not clean the data for games that were outliers in the opposite direction, because we felt that longer games would have factors that were worth analyzing and would not be won or lost by factors outside of what we are analyzing. 
 
 
-…
+```
 #looking at game duration to see any trends in game duration among ranked play participants 
 
 df['gameduration'].describe()
@@ -73,11 +73,11 @@ min       1241.000000
 75%       2242.000000
 max       4132.000000
 Name: gameduration, dtype: float64
-…
+```
 
 
-####
 ***Modeling our Data***
+
 Our first step in modeling the data was looking for correlations within the data, which we did using a heat map. 
 
 ![](Pearson_Correlation.png)
@@ -141,7 +141,7 @@ For our pre-game data set, we included all elements of our data set that are dec
 *** Early-Game Data ***
 The early game factors we looked at were: first blood, first tower, first inhibitor, first baron, first rift herald, and first dragon. Once again, we based our model around whichever team won the match. Upon running the random forest model on this dataframe, we sorted the factors by order of importance.
 
-…
+```
 #sort the features by their importance.
 importances = rf_model.feature_importances_
 sorted(zip(rf_model.feature_importances_, X.columns), reverse=True)
@@ -151,11 +151,11 @@ sorted(zip(rf_model.feature_importances_, X.columns), reverse=True)
  (0.03193261753448579, 'firsttower'),
  (0.019608371483879602, 'firstdragon'),
  (0.0028691238394123572, 'firstblood')]
+```
 
-…
 Our model indicated that a team gaining the first inhibitor was the most important factor in the set for winning the game. This model had an accuracy score of 88%. We double checked this with a logistic regression model and came up with the exact same number of 88%.  
 
-…
+```
 #create a logistic regression model 
 classifier = LogisticRegression(solver='lbfgs', random_state=1)
 
@@ -163,12 +163,12 @@ classifier = LogisticRegression(solver='lbfgs', random_state=1)
 classifier.fit(X_train, y_train)
 LogisticRegression(random_state=1)
 
-# Predict outcomes for test data set
+#Predict outcomes for test data set
 predictions = classifier.predict(X_test)
 accuracy_score(y_test, predictions)
 0.8822269807280514
+```
 
-…
 
 
 The model’s ranking makes sense given the mechanics of the game. In order to claim the first inhibitor kill, the team who makes the kill must have pushed down the entire land to the opponents base. Additionally, after an inhibitor structure is destroyed, the minions spawning in that lane receive a power-up, allowing them to push the lane more effectively. 
@@ -176,10 +176,10 @@ The model’s ranking makes sense given the mechanics of the game. In order to c
 Barons are important as well, and give power-ups to the team that kills them. This includes enhanced attack damage for three minutes of gameplay, as well as a radius around each player that increases the power of nearby friendly minions. This is a boon to push other structures or team fight, allowing for further level increases and a future advantage to the team. 
 
 
-*** End-Game Data ***
+***End-Game Data***
 We ran the same random forest classifier model on the end game factors as we ran on the previous two. While the importance of the factors was much smaller than those of the early-game, the accuracy rating was higher, at 96%.
 
-…
+```
 #sort the features by their importance.
 importances = rf_model.feature_importances_
 sorted(zip(rf_model.feature_importances_, X.columns), reverse=True)
@@ -193,7 +193,7 @@ sorted(zip(rf_model.feature_importances_, X.columns), reverse=True)
  (0.018299004925989435, 't1_dragonkills'),
  (0.00430114404832934, 't2_riftheraldkills'),
  (0.0035274934677607377, 't1_riftheraldkills')]
-…
+```
 
 We can account for this low importance, but high accuracy since these numbers can only be gathered once the game has concluded. It is most likely, for example, that the team that killed the most towers won, but that is not a good predictor of winning since you cannot determine this until the winner has already been decided. 
 Due to this fact, we decided to drop end-game data from consideration, as we felt it was not a helpful predictor. 
@@ -201,7 +201,7 @@ Due to this fact, we decided to drop end-game data from consideration, as we fel
 
 ### Digging Deeper
 
-*** Early-Game Factors ***
+***Early-Game Factors***
 
 After running our initial models, we had additional questions about the win rate for each of the significant factors in the early-game data that had such a high accuracy rating. We wanted to see what combining the factors into sets of two, three, or even four would do to the percentage chance of winning. 
 
@@ -209,7 +209,7 @@ Our first step was using combinations from iterrools to create each combination 
 
 The results were conclusive – as the number of factors increased (from 2 to 3, and 3 to 4) the percentage of wins became greater, however, the combinations that outperformed the rest were the factors the model deemed more significant. As you can see from the output below, the first baron and first inhibitor combination indicates the team has a 90% chance of winning the game. 
 
-…
+```
 def two_combo_winrate(df,team,feat1,feat2,feat3,feat4,feat5,feat6,target):
     counter_win = 0
     counter_lose = 0
@@ -265,9 +265,9 @@ firstblood/firstriftherald
 0.06859205776173286
 firsttower/firstriftherald
 0.09363295880149813
-…
+```
 
-*** Looking at Game Length ***
+***Looking at Game Length***
 
 
 Another question that was raised for us was whether there was a difference in factors for longer games than shorter games. We decided to split the game duration at the mean (1,963 seconds), and proceeded to drop the end game factors. We ran a random forest classifier model to look at the importances of factors. In the games split off up to the mean duration, the importances looked very similar to our initial model, with the champion and summoning spell choices with very low importance. When re re-ran the same model with the data from the slower games, the champion IDs and bans gained greatly in importance. 
