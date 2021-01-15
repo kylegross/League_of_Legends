@@ -1,5 +1,5 @@
 # League of Legends - Analysis of Gameplay Factors for the Winning Team
-## [Dashboard Here](https://public.tableau.com/profile/kyle.gross3648#!/vizhome/shared/RWZB54NB5)
+## [Dashboard Here](https://public.tableau.com/profile/kyle.gross3648#!/vizhome/shared/24M48W6DT)
 
 ## Selected Topic
 
@@ -274,5 +274,4 @@ firsttower/firstriftherald
 Another question that was raised for us was whether there was a difference in factors for longer games than shorter games. We decided to split the game duration at the mean (1,963 seconds), and proceeded to drop the end game factors. We ran a random forest classifier model to look at the importances of factors. In the games split off up to the mean duration, the importances looked very similar to our initial model, with the champion and summoning spell choices with very low importance. When re re-ran the same model with the data from the slower games, the champion IDs and bans gained greatly in importance. 
 
 ![](fast_game_snip.png)  ![](slow_game_snip.png)
-
 
